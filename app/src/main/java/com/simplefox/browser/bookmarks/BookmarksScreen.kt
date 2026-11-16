@@ -15,8 +15,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import com.simplefox.browser.R
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.AnimatedVisibility
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image

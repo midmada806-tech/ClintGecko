@@ -1,4 +1,6 @@
 package com.simplefox.browser.browser
+import com.simplefox.browser.browser.imagereader.openImageReaderForUrl
+import com.simplefox.browser.browser.imagereader.startImageReader
 import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.browser.home.CLINT_HOME_HOST
 import com.simplefox.browser.browser.home.isClintHomeUrl
@@ -97,6 +99,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     internal var nestedScrollActive = false
     internal var canvasTouchActive = false
     internal var swipeGuardBlocked = false
+    internal var pipAspectRatio: android.util.Rational? = null
     internal var contentInsetsUpdatePosted = false
     private var swipeGuardInitX = 0f
     private var swipeGuardInitY = 0f
@@ -513,6 +516,11 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         tabManager.activeTab?.webView?.onResume()
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        enterVideoPictureInPicture()
+    }
+
     override fun onStop() {
         super.onStop()
         recordBrowsingMode()
@@ -666,7 +674,14 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     fun onTabSelected(index: Int) { captureActiveTabThumbnail(); tabManager.switchTo(index); attachActiveWebView() }
     fun onSwipeTabChange(direction: Int): Boolean {
-        val visibleIndices = tabManager.tabs.indices.filter { !tabManager.isGhostTab(tabManager.tabs[it]) }
+        // direction: 1 = swipe right (previous tab), -1 = swipe left (next tab).
+        // Only moves through tabs of the current mode (normal / incognito); no wrap-around at the ends.
+        val activeIncognito = tabManager.activeTab?.isIncognito == true
+        val visibleIndices = tabManager.tabs.indices.filter {
+            val tab = tabManager.tabs[it]
+            !tabManager.isGhostTab(tab) && tab.isIncognito == activeIncognito
+        }
+        if (visibleIndices.size < 2) return false
         val currentPos = visibleIndices.indexOf(tabManager.activeIndex)
         if (currentPos == -1) return false
         val newPos = currentPos - direction
@@ -917,6 +932,10 @@ td,th{border:1px solid $secondaryColor;padding:6px 8px;}
         }
     }
 
+    fun onMenuImageReader() = startImageReader()
+
+    fun openImageReaderFor(url: String) = openImageReaderForUrl(url)
+
     inner class NestedScrollBridge {
         @android.webkit.JavascriptInterface
         fun onNestedScroll(active: Boolean) {
@@ -1066,7 +1085,7 @@ td,th{border:1px solid $secondaryColor;padding:6px 8px;}
         when (prefs.getString("scroll_hide_mode", "off")) {
             "top_only" -> prefs.edit().putString("scroll_hide_mode", "search_bar").apply()
             "bottom_only" -> {
-                val position = prefs.getString("address_bar_position", "top") ?: "top"
+                val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
                 val newValue = if (position == "bottom") "search_bar" else "navigation_bar"
                 prefs.edit().putString("scroll_hide_mode", newValue).apply()
             }

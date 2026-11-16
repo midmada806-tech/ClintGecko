@@ -31,6 +31,7 @@ private fun MainActivity.applyFullscreenOrientation(view: View, retry: Boolean) 
             view.postDelayed({ if (fullscreenView === view) applyFullscreenOrientation(view, retry = false) }, 400)
             return@queryVideoSize
         }
+        if (vw > 0 && vh > 0) updatePictureInPictureParams(vw, vh)
         requestedOrientation = when {
             vw > 0 && vh > 0 && vh > vw -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
             else -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
@@ -42,6 +43,8 @@ internal fun MainActivity.exitFullscreen() {
     fullscreenCallback?.onCustomViewHidden()
     fullscreenCallback = null
     fullscreenView = null
+    pipAspectRatio = null
+    clearPictureInPictureParams()
     uiState.isFullscreen = false
     bottomBarAnimator2?.cancel()
     uiState.topBarFraction = 0f
@@ -77,4 +80,39 @@ internal fun MainActivity.applySystemUiVisibility() {
     } else {
         controller.show(WindowInsetsCompat.Type.navigationBars())
     }
+}
+
+private fun pipRatio(width: Int, height: Int): android.util.Rational {
+    // Android only accepts aspect ratios between roughly 1:2.39 and 2.39:1.
+    val ratio = width.toFloat() / height.toFloat()
+    return when {
+        ratio > 2.39f -> android.util.Rational(239, 100)
+        ratio < 0.42f -> android.util.Rational(42, 100)
+        else -> android.util.Rational(width, height)
+    }
+}
+
+internal fun MainActivity.updatePictureInPictureParams(videoWidth: Int, videoHeight: Int) {
+    if (!packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE)) return
+    val ratio = pipRatio(videoWidth, videoHeight)
+    pipAspectRatio = ratio
+    val builder = android.app.PictureInPictureParams.Builder().setAspectRatio(ratio)
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) builder.setAutoEnterEnabled(true)
+    runCatching { setPictureInPictureParams(builder.build()) }
+}
+
+internal fun MainActivity.clearPictureInPictureParams() {
+    if (!packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE)) return
+    val builder = android.app.PictureInPictureParams.Builder()
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) builder.setAutoEnterEnabled(false)
+    runCatching { setPictureInPictureParams(builder.build()) }
+}
+
+internal fun MainActivity.enterVideoPictureInPicture() {
+    if (fullscreenView == null) return
+    if (!packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE)) return
+    val params = android.app.PictureInPictureParams.Builder()
+        .setAspectRatio(pipAspectRatio ?: android.util.Rational(16, 9))
+        .build()
+    runCatching { enterPictureInPictureMode(params) }
 }

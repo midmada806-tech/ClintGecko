@@ -26,7 +26,7 @@ private const val SUGGESTION_HISTORY_LIMIT = 20
 private const val SUGGESTION_BOOKMARK_LIMIT = 10
 
 internal fun MainActivity.applyAddressBarPosition() {
-    val position = prefs.getString("address_bar_position", "top") ?: "top"
+    val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
     uiState.addressBarPosition = when (position) {
         "top" -> AddressBarPosition.TOP
         "bottom" -> AddressBarPosition.BOTTOM
@@ -348,6 +348,10 @@ internal fun MainActivity.onPageFinished(url: String) {
     }
     nestedScrollActive = false
     canvasTouchActive = false
+    if (com.simplefox.browser.browser.imagereader.ImageReaderState.autoOpenAfterLoad) {
+        com.simplefox.browser.browser.imagereader.ImageReaderState.autoOpenAfterLoad = false
+        onMenuImageReader()
+    }
     updateBookmarkIcon()
 
     tabManager.activeTab?.let { tab ->

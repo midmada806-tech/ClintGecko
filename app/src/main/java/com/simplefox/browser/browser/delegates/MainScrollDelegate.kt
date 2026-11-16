@@ -59,7 +59,7 @@ internal fun MainActivity.updateMainContentInsets() {
     swipeRefreshView.setPadding(0, visibleTop, 0, maxOf(visibleBottom, uiState.imeInsetPx))
     webContainer.translationY = if (topCollapsed) (1f - uiState.topBarFraction) * contentBarHeight else 0f
     val mode = prefs.getString("scroll_hide_mode", "off") ?: "off"
-    val position = prefs.getString("address_bar_position", "top") ?: "top"
+    val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
     val barsHidden = mode != "off" && when (mode) {
         "search_bar" -> if (position == "bottom") uiState.bottomBarFraction >= 1f else uiState.topBarFraction >= 1f
         "navigation_bar" -> uiState.bottomBarFraction >= 1f
@@ -70,7 +70,7 @@ internal fun MainActivity.updateMainContentInsets() {
 
 private const val HIDE_THRESHOLD_DP = 24
 private const val SHOW_THRESHOLD_DP = 12
-private const val BAR_ANIMATION_MS = 200L
+private const val BAR_ANIMATION_MS = 0L
 private const val BAR_SETTLE_MS = 160L
 
 private fun MainActivity.scrollHideSettledHidden(mode: String, position: String): Boolean {
@@ -180,7 +180,7 @@ internal fun MainActivity.attachScrollListener(webView: ClintWebView) {
     fun handleScroll(atTop: Boolean, delta: Int) {
         val mode = prefs.getString("scroll_hide_mode", "off") ?: "off"
         if (mode == "off" || webView !== tabManager.activeTab?.webView) return
-        val position = prefs.getString("address_bar_position", "top") ?: "top"
+        val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
         val hidden = scrollHideSettledHidden(mode, position)
         val now = SystemClock.uptimeMillis()
         if (atTop) {

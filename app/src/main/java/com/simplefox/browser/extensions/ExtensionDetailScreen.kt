@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -94,28 +95,8 @@ fun ExtensionDetailScreen(
 
     Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
-                Row(
-                    Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = colors.onSurface)
-                    }
-                    Text(
-                        info.name,
-                        color = colors.onSurface,
-                        fontSize = 19.sp,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f).padding(start = 4.dp)
-                    )
-                }
-            }
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-            Box(Modifier.weight(1f).fillMaxWidth()) {
+            Box(Modifier.weight(1f).fillMaxWidth().statusBarsPadding()) {
                 AdaptiveWidthContainer(maxContentWidth) {
                     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
                         DetailHeader(info, busy)
@@ -307,6 +288,26 @@ fun ExtensionDetailScreen(
                         Spacer(Modifier.height(12.dp))
                         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                     }
+                }
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+                Row(
+                    Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = colors.onSurface)
+                    }
+                    Text(
+                        info.name,
+                        color = colors.onSurface,
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f).padding(start = 4.dp)
+                    )
                 }
             }
         }

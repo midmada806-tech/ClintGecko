@@ -131,11 +131,11 @@ internal fun TabStrip(
         val fullyVisible = visible != null &&
             visible.offset >= info.viewportStartOffset &&
             visible.offset + visible.size <= info.viewportEndOffset
-        if (!fullyVisible) listState.animateScrollToItem((activeIndex - 1).coerceAtLeast(0))
+        if (!fullyVisible) listState.scrollToItem((activeIndex - 1).coerceAtLeast(0))
     }
-    BoxWithConstraints(modifier.fillMaxWidth().height(40.dp)) {
+    BoxWithConstraints(modifier.fillMaxWidth().height(34.dp)) {
         val tabCount = items.count { it is TabStripItem.Tab }.coerceAtLeast(1)
-        val tabWidth = ((maxWidth - 44.dp) / tabCount).coerceIn(104.dp, 196.dp)
+        val tabWidth = ((maxWidth - 40.dp) / tabCount).coerceIn(104.dp, 196.dp)
         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             LazyRow(
                 state = listState,
@@ -175,7 +175,7 @@ internal fun TabStrip(
                     }
                 }
             }
-            IconButton(onClick = onNewTab, modifier = Modifier.size(40.dp)) {
+            IconButton(onClick = onNewTab, modifier = Modifier.size(34.dp)) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = stringResource(if (state.isIncognito) R.string.new_incognito_tab else R.string.new_tab),
@@ -267,7 +267,8 @@ private fun TabStripTab(
         ) {
             Box(Modifier.size(19.dp)) {
                 if (favicon != null && !preview.isIncognito) {
-                    Image(favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(16.dp).align(Alignment.TopStart))
+                    val faviconImage = remember(favicon) { favicon.asImageBitmap() }
+                    Image(faviconImage, contentDescription = null, modifier = Modifier.size(16.dp).align(Alignment.TopStart))
                 } else {
                     Icon(
                         if (preview.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,

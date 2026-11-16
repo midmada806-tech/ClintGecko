@@ -1,9 +1,9 @@
 package com.simplefox.browser.tabs
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.AnimatedContent
+import com.simplefox.browser.ui.AnimatedVisibility
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -258,8 +258,8 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     var searchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var listView by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_LIST_VIEW, false)) }
-    var buttonsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_BUTTONS_AT_BOTTOM, false)) }
-    var tabsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_TABS_AT_BOTTOM, false)) }
+    var buttonsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_BUTTONS_AT_BOTTOM, true)) }
+    var tabsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_TABS_AT_BOTTOM, true)) }
     val hasDuplicates by remember { derivedStateOf { duplicateTabIds(tabs, activeTabId).isNotEmpty() } }
 
     fun closeSearch() {
@@ -460,7 +460,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         LaunchedEffect(scrollToGroupId, renderList.size) {
             val target = scrollToGroupId ?: return@LaunchedEffect
             val index = renderList.indexOfFirst { it.key == groupHeaderKey(target) }
-            if (index >= 0) gridState.animateScrollToItem(index)
+            if (index >= 0) gridState.scrollToItem(index)
             scrollToGroupId = null
         }
 
@@ -1132,11 +1132,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
 @Composable
 private fun LazyGridItemScope.AnimatedGridItem(content: @Composable () -> Unit) {
     Box(
-        Modifier.animateItem(
-            fadeInSpec = tween(220),
-            placementSpec = spring(dampingRatio = 0.8f, stiffness = 380f),
-            fadeOutSpec = tween(150)
-        )
+        Modifier
     ) {
         content()
     }
@@ -1251,7 +1247,7 @@ private fun TabMenuTopBar(
                             onNewProfileTab = onNewProfileTab,
                             onNewTabGroup = if (groupsEnabled) onNewTabGroup else null,
                             showGroupBar = showGroupBar,
-                            onToggleGroupBar = if (groupsEnabled) onToggleGroupBar else null,
+                            onToggleGroupBar = null,
                             onCollapseAllGroups = if (hasGroups && !allGroupsCollapsed) onCollapseAllGroups else null,
                             onExpandAllGroups = if (hasGroups && allGroupsCollapsed) onExpandAllGroups else null,
                             onCloseDuplicates = onCloseDuplicates,

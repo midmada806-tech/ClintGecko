@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.VisibilityOff
 
-import androidx.compose.animation.AnimatedContent
+import com.simplefox.browser.ui.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -123,8 +123,8 @@ internal fun AddressBarRow(
         (translationState.canTranslate || translationState.isRequested)
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var swipeDirection by remember { mutableIntStateOf(0) }
-    val swipeThresholdPx = with(density) { 56.dp.toPx() }
-    val maxDragPx = with(density) { 72.dp.toPx() }
+    val swipeThresholdPx = with(density) { 96.dp.toPx() }
+    val maxDragPx = with(density) { 120.dp.toPx() }
     var verticalDrag by remember { mutableFloatStateOf(0f) }
     val openTabsThresholdPx = with(density) { 40.dp.toPx() }
     val openTabsFlingPx = with(density) { 600.dp.toPx() }
@@ -137,7 +137,31 @@ internal fun AddressBarRow(
         }
     }
     Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+        modifier = modifier.fillMaxWidth()
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { delta ->
+                    dragOffset = (dragOffset + delta).coerceIn(-maxDragPx, maxDragPx)
+                },
+                onDragStopped = {
+                    val value = dragOffset
+                    val settle: suspend (Float) -> Unit = { start ->
+                        dragOffset = 0f
+                    }
+                    when {
+                        value <= -swipeThresholdPx -> {
+                            swipeDirection = -1
+                            if (onSwipeTabChange(-1)) dragOffset = 0f else settle(value)
+                        }
+                        value >= swipeThresholdPx -> {
+                            swipeDirection = 1
+                            if (onSwipeTabChange(1)) dragOffset = 0f else settle(value)
+                        }
+                        else -> settle(value)
+                    }
+                }
+            )
+            .padding(horizontal = 8.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isIncognito) {
@@ -153,7 +177,7 @@ internal fun AddressBarRow(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(end = 6.dp)
-                    .size(40.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .clickable(onClick = onHomeClick)
             ) {
@@ -167,10 +191,10 @@ internal fun AddressBarRow(
         }
         Surface(
             color = colors.addressBarColor,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp)
+                .height(40.dp)
                 .combinedClickable(
                     onClick = onAddressBarClick,
                     onLongClick = {
@@ -178,29 +202,6 @@ internal fun AddressBarRow(
                         if (addressBarText.isNotEmpty() || canPaste) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             showEditMenu = true
-                        }
-                    }
-                )
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    state = rememberDraggableState { delta ->
-                        dragOffset = (dragOffset + delta).coerceIn(-maxDragPx, maxDragPx)
-                    },
-                    onDragStopped = {
-                        val value = dragOffset
-                        val settle: suspend (Float) -> Unit = { start ->
-                            androidx.compose.animation.core.animate(start, 0f, animationSpec = tween(220)) { v, _ -> dragOffset = v }
-                        }
-                        when {
-                            value <= -swipeThresholdPx -> {
-                                swipeDirection = -1
-                                if (onSwipeTabChange(-1)) dragOffset = 0f else settle(value)
-                            }
-                            value >= swipeThresholdPx -> {
-                                swipeDirection = 1
-                                if (onSwipeTabChange(1)) dragOffset = 0f else settle(value)
-                            }
-                            else -> settle(value)
                         }
                     }
                 )
@@ -249,7 +250,7 @@ internal fun AddressBarRow(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(32.dp)
                         .clip(CircleShape)
                         .then(
                             if (hasSiteInfo) {
@@ -295,7 +296,7 @@ internal fun AddressBarRow(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .padding(start = 4.dp)
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
                             .clickable(
                                 onClickLabel = stringResource(R.string.translation_menu_translate),
@@ -323,8 +324,8 @@ internal fun AddressBarRow(
         if (isMediaCaptureEnabled) {
             Box(
                 modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(34.dp)
+                    .padding(start = 8.dp)
+                    .size(30.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -400,7 +401,7 @@ internal fun AddressBarRow(
                 )
             )
         }
-        Box(modifier = Modifier.padding(start = 4.dp).size(40.dp), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.padding(start = 4.dp).size(36.dp), contentAlignment = Alignment.Center) {
             com.simplefox.browser.browser.menu.MenuTriggerButton(activity)
         }
     }

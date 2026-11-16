@@ -1,7 +1,7 @@
 package com.simplefox.browser.privacy
 
 import android.text.format.Formatter
-import androidx.compose.animation.animateColorAsState
+import com.simplefox.browser.ui.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

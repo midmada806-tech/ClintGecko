@@ -5,7 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -268,7 +268,7 @@ private fun Modifier.animatePlacement(enabled: Boolean): Modifier = composed {
                 IntOffset.Zero
             } else {
                 if (anim.targetValue != target) {
-                    scope.launch { anim.animateTo(target, spring(stiffness = Spring.StiffnessMediumLow)) }
+                    scope.launch { anim.snapTo(target) }
                 }
                 anim.value - target
             }

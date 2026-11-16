@@ -1,6 +1,6 @@
 package com.simplefox.browser.tabs
 
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -128,7 +128,7 @@ internal fun TabGroupBar(
     val collapsed = state.group.collapsed
     val activeIndex = state.tabs.indexOfFirst { it.id == state.activeTabId }
     LaunchedEffect(state.activeTabId, state.tabs.size, collapsed) {
-        if (!collapsed && activeIndex >= 0) listState.animateScrollToItem(activeIndex)
+        if (!collapsed && activeIndex >= 0) listState.scrollToItem(activeIndex)
     }
     val groupName = tabGroupDisplayName(state.group)
     val toggleDescription = stringResource(

@@ -240,7 +240,7 @@ internal fun SearchOverlay(
                     onClick = { onSuggestionClick(it.query) },
                     onFill = { fill(it.query) },
                     onDelete = { onSuggestionDelete(it.query) },
-                    modifier = Modifier.animateItem()
+                    modifier = Modifier
                 )
             }
         }

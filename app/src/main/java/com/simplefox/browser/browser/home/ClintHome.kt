@@ -3,7 +3,7 @@ package com.simplefox.browser.browser.home
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -415,14 +415,6 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
                     if (centered) Spacer(Modifier.height(16.dp))
                     if (isDesktop) {
                         if (!centered) Spacer(Modifier.height(if (compact) 16.dp else 56.dp))
-                        HomeDesktopHero(
-                            isIncognito = isIncognito,
-                            showGlow = design == HOMEPAGE_DESIGN_GRADIENT,
-                            compact = compact,
-                            greeting = stringResource(greetingRes),
-                            date = dateText
-                        )
-                        Spacer(Modifier.height(if (compact) 18.dp else 32.dp))
                         HomeSearchPill(
                             hint = hint,
                             onClick = openSearch,
@@ -436,13 +428,6 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
                         }
                     } else {
                         if (!centered) Spacer(Modifier.height(if (compact) 12.dp else 40.dp))
-                        HomeHero(
-                            isIncognito = isIncognito,
-                            showGlow = design == HOMEPAGE_DESIGN_GRADIENT,
-                            compact = compact,
-                            greeting = stringResource(greetingRes)
-                        )
-                        Spacer(Modifier.height(if (compact) 16.dp else 28.dp))
                         HomeSearchPill(hint = hint, onClick = openSearch, onVoice = openVoice)
                         if (showQuickActions) {
                             Spacer(Modifier.height(if (compact) 16.dp else 28.dp))

@@ -188,6 +188,10 @@ abstract class ClintActivity : AppCompatActivity() {
 
     private fun startRevealIfNeeded() {
         val (bmp, cx, cy) = ThemeRevealHolder.consume() ?: return
+        if (!THEME_REVEAL_ANIMATION_ENABLED) {
+            bmp.recycle()
+            return
+        }
         if (isFinishing || isDestroyed) {
             bmp.recycle()
             return
@@ -275,3 +279,5 @@ abstract class ClintActivity : AppCompatActivity() {
         window.decorView.requestApplyInsets()
     }
 }
+
+private const val THEME_REVEAL_ANIMATION_ENABLED = false

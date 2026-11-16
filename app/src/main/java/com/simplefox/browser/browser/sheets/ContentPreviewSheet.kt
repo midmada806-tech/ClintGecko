@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,11 +73,18 @@ data class ContentPreviewRequest(
     val isDesktop: Boolean = false,
     val isReaderMode: Boolean = false,
     val readerHtml: String = "",
-    val readerTitle: String = ""
+    val readerTitle: String = "",
+    val prevUrl: String = "",
+    val nextUrl: String = "",
+    val isImageReader: Boolean = false,
+    val images: List<String> = emptyList(),
+    val allImages: List<String> = emptyList()
 ) {
     companion object {
         fun forImage(imageUrl: String) = ContentPreviewRequest(url = imageUrl, isPage = false)
         fun forPage(pageUrl: String, isDesktop: Boolean) = ContentPreviewRequest(url = pageUrl, isPage = true, isDesktop = isDesktop)
+        fun forImageReader(pageUrl: String, pageTitle: String, html: String, prevUrl: String, nextUrl: String, images: List<String>, allImages: List<String> = images) =
+            ContentPreviewRequest(url = pageUrl, isPage = false, isReaderMode = true, readerHtml = html, readerTitle = pageTitle, prevUrl = prevUrl, nextUrl = nextUrl, isImageReader = true, images = images, allImages = allImages)
         fun forReaderMode(pageUrl: String, pageTitle: String, html: String) =
             ContentPreviewRequest(url = pageUrl, isPage = false, isReaderMode = true, readerHtml = html, readerTitle = pageTitle)
     }
@@ -99,6 +107,8 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
     var webViewRef by remember { mutableStateOf<ClintWebView?>(null) }
     var webViewScrollY by remember { mutableIntStateOf(0) }
 
+    var showReaderSettings by remember { mutableStateOf(false) }
+    var readerPrefs by remember { mutableStateOf(com.simplefox.browser.browser.imagereader.ImageReaderStore.load(context)) }
     var nestedImageRequest by remember { mutableStateOf<ImageLongPressRequest?>(null) }
     var nestedPreviewLinkRequest by remember { mutableStateOf<PreviewLinkLongPressRequest?>(null) }
 
@@ -148,6 +158,11 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                         Text(titleText, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                         Text(urlText, color = colors.secondaryText, fontSize = 11.sp, maxLines = 1)
                     }
+                    if (request.isImageReader) {
+                        IconButton(onClick = { showReaderSettings = true }, modifier = Modifier.size(44.dp)) {
+                            Icon(androidx.compose.material.icons.Icons.Filled.Tune, contentDescription = stringResource(R.string.image_reader_settings), tint = colors.iconTint)
+                        }
+                    }
                     IconButton(onClick = {
                         val currentUrl = if (request.isPage) webViewRef?.url?.takeIf { it.isNotEmpty() } ?: request.url else request.url
                         onDismiss()
@@ -176,7 +191,47 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                     onPreviewLinkLongPress = { nestedPreviewLinkRequest = it }
                 )
             }
+            if (request.isImageReader) {
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                Surface(color = colors.popupBackground) {
+                    Row(
+                        Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp),
+                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+                    ) {
+                        androidx.compose.material3.FilledTonalButton(
+                            onClick = { onDismiss(); activity.openImageReaderFor(request.prevUrl) },
+                            enabled = request.prevUrl.isNotEmpty(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.image_reader_prev), modifier = Modifier.padding(start = 6.dp))
+                        }
+                        androidx.compose.material3.FilledTonalButton(
+                            onClick = { onDismiss(); activity.openImageReaderFor(request.nextUrl) },
+                            enabled = request.nextUrl.isNotEmpty(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.image_reader_next), modifier = Modifier.padding(end = 6.dp))
+                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    if (showReaderSettings && request.isImageReader) {
+        com.simplefox.browser.browser.imagereader.ImageReaderSettingsSheet(
+            activity = activity,
+            request = request,
+            prefs = readerPrefs,
+            onPrefsChange = { np ->
+                readerPrefs = np
+                com.simplefox.browser.browser.imagereader.ImageReaderStore.save(context, np)
+                webViewRef?.loadHtml(com.simplefox.browser.browser.imagereader.ImageReaderHtml.build(request.images, np))
+            },
+            onDismiss = { showReaderSettings = false }
+        )
     }
 
     nestedImageRequest?.let { req ->

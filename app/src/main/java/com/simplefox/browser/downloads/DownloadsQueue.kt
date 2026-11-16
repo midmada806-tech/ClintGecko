@@ -2,7 +2,7 @@ package com.simplefox.browser.downloads
 
 import android.os.Environment
 import android.os.StatFs
-import androidx.compose.animation.AnimatedVisibility
+import com.simplefox.browser.ui.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

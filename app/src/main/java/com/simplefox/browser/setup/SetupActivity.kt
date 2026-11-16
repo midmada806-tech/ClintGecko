@@ -102,7 +102,7 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
             initialAccent = prefs.getString("accent_color", "material_you") ?: "material_you",
             initialIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint",
             initialLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM,
-            initialAddressBarPosition = prefs.getString("address_bar_position", "top") ?: "top",
+            initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
             initialMenuStyle = prefs.getString("menu_style", "popup") ?: "popup",
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
             initialHideStatusBar = hideStatusBar, initialHideSystemNavigation = hideSystemNavigation,

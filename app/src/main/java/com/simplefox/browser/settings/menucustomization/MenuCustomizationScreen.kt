@@ -1,6 +1,6 @@
 package com.simplefox.browser.settings.menucustomization
 
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -109,11 +109,7 @@ fun MenuCustomizationScreen(
                                 val isDragging = dragState.draggingId == entry.item.id
                                 val ghostAlpha by animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
                                 Box(
-                                    Modifier.animateItem(
-                                        fadeInSpec = tween(220),
-                                        placementSpec = spring(dampingRatio = 0.82f, stiffness = 400f),
-                                        fadeOutSpec = tween(150)
-                                    )
+                                    Modifier
                                 ) {
                                     MenuCustomizeRow(
                                         entry = entry,

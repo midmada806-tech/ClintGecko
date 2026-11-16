@@ -1,7 +1,7 @@
 package com.simplefox.browser.browser
 import com.simplefox.browser.browser.home.ClintHomeScreen
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.AnimatedVisibility
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -129,7 +129,6 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
             openTabSwitcher()
         }
         val tabStripAtTop = resolveTabBarAtTop(state.tabStripPosition, state.addressBarPosition)
-        val tabGroupBarAtTop = resolveTabBarAtTop(state.tabGroupBarPosition, state.addressBarPosition)
         val chromeVisible = !state.isFullscreen && !state.isShortcutFrameless
 
         if (!state.isFullscreen && !state.isShortcutFrameless && (state.addressBarPosition == AddressBarPosition.TOP || state.addressBarPosition == AddressBarPosition.SPLIT)) {
@@ -140,7 +139,6 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
                 onTabCountClick = openTabSwitcher,
                 onOpenTabGroup = openTabGroup,
                 showTabStrip = tabStripAtTop,
-                showTabGroupBar = tabGroupBarAtTop,
                 modifier = Modifier.align(Alignment.TopStart)
             )
         }
@@ -151,7 +149,6 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
                 state = state,
                 navBarPaddingPx = effectiveNavBarPx,
                 showTabStrip = !tabStripAtTop,
-                showTabGroupBar = !tabGroupBarAtTop,
                 onOpenTabGroup = openTabGroup,
                 modifier = Modifier.align(Alignment.BottomStart)
             )
@@ -165,30 +162,27 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
                 onTabCountClick = openTabSwitcher,
                 onOpenTabGroup = openTabGroup,
                 showTabStrip = !tabStripAtTop,
-                showTabGroupBar = !tabGroupBarAtTop,
                 modifier = Modifier.align(Alignment.BottomStart)
             )
         }
 
-        if (chromeVisible && state.addressBarPosition == AddressBarPosition.BOTTOM && (tabStripAtTop || tabGroupBarAtTop)) {
+        if (chromeVisible && state.addressBarPosition == AddressBarPosition.BOTTOM && tabStripAtTop) {
             TopTabBarsAccessory(
                 activity = activity,
                 state = state,
                 statusBarPaddingPx = effectiveStatusBarPx,
                 showTabStrip = tabStripAtTop,
-                showTabGroupBar = tabGroupBarAtTop,
                 onOpenTabGroup = openTabGroup,
                 modifier = Modifier.align(Alignment.TopStart)
             )
         }
 
-        if (chromeVisible && state.addressBarPosition == AddressBarPosition.TOP && (!tabStripAtTop || !tabGroupBarAtTop)) {
+        if (chromeVisible && state.addressBarPosition == AddressBarPosition.TOP && !tabStripAtTop) {
             BottomTabBarsAccessory(
                 activity = activity,
                 state = state,
                 navBarPaddingPx = effectiveNavBarPx,
                 showTabStrip = !tabStripAtTop,
-                showTabGroupBar = !tabGroupBarAtTop,
                 onOpenTabGroup = openTabGroup,
                 modifier = Modifier.align(Alignment.BottomStart)
             )
@@ -400,7 +394,6 @@ private fun TopToolbar(
     onTabCountClick: () -> Unit,
     onOpenTabGroup: (String) -> Unit,
     showTabStrip: Boolean,
-    showTabGroupBar: Boolean,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalClintColors.current
@@ -441,7 +434,6 @@ private fun TopToolbar(
             onSiteInfoClick = { if (!activity.openSiteInfo()) activity.openSearchOverlay(isBottom = false) },
             openTabsSwipeDirection = 1
         )
-        if (showTabGroupBar) TabGroupBarSlot(activity, state, onOpenTabGroup)
         PageLoadProgress(state)
     }
 }
@@ -459,7 +451,6 @@ private fun TopTabBarsAccessory(
     state: MainUiState,
     statusBarPaddingPx: Int,
     showTabStrip: Boolean,
-    showTabGroupBar: Boolean,
     onOpenTabGroup: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -490,7 +481,6 @@ private fun TopTabBarsAccessory(
             .padding(top = with(density) { statusBarPaddingPx.toDp() })
     ) {
         if (showTabStrip) TabStripSlot(activity, state, onOpenTabGroup)
-        if (showTabGroupBar) TabGroupBarSlot(activity, state, onOpenTabGroup)
     }
 }
 
@@ -500,7 +490,6 @@ private fun BottomTabBarsAccessory(
     state: MainUiState,
     navBarPaddingPx: Int,
     showTabStrip: Boolean,
-    showTabGroupBar: Boolean,
     onOpenTabGroup: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -526,7 +515,6 @@ private fun BottomTabBarsAccessory(
             .background(colors.surface)
             .padding(bottom = with(density) { navBarPaddingPx.toDp() })
     ) {
-        if (showTabGroupBar) TabGroupBarSlot(activity, state, onOpenTabGroup)
         if (showTabStrip) TabStripSlot(activity, state, onOpenTabGroup)
     }
 }
@@ -559,31 +547,9 @@ private fun TabStripSlot(activity: MainActivity, state: MainUiState, onOpenTabGr
 }
 
 @Composable
-private fun TabGroupBarSlot(activity: MainActivity, state: MainUiState, onOpenTabGroup: (String) -> Unit) {
-    val bar = state.tabGroupBar
-    AnimatedVisibility(
-        visible = bar != null,
-        enter = fadeIn(tween(180)) + expandVertically(tween(220)),
-        exit = fadeOut(tween(140)) + shrinkVertically(tween(200))
-    ) {
-        val lastBar = remember { mutableStateOf(bar) }
-        if (bar != null) lastBar.value = bar
-        lastBar.value?.let { shown ->
-            com.simplefox.browser.tabs.TabGroupBar(
-                state = shown,
-                onSelectTab = { id -> activity.focusTabById(id) },
-                onNewTab = { activity.openNewTabInGroup(shown.group.id) },
-                onToggleCollapsed = { activity.toggleTabGroupCollapsed(shown.group.id) },
-                onOpenGroup = { onOpenTabGroup(shown.group.id) }
-            )
-        }
-    }
-}
-
-@Composable
 private fun PageLoadProgress(state: MainUiState) {
     val colors = LocalClintColors.current
-    Box(modifier = Modifier.fillMaxWidth().height(4.dp)) {
+    Box(modifier = Modifier.fillMaxWidth().height(3.dp)) {
         if (state.isPageLoading) {
             val shownProgress by animateFloatAsState(
                 targetValue = maxOf(state.pageLoadProgress, 20) / 100f,
@@ -594,7 +560,7 @@ private fun PageLoadProgress(state: MainUiState) {
                 progress = { shownProgress },
                 color = colors.primary,
                 trackColor = colors.surface,
-                modifier = Modifier.fillMaxWidth().height(4.dp)
+                modifier = Modifier.fillMaxWidth().height(3.dp)
             )
         }
     }
@@ -608,7 +574,6 @@ private fun BottomToolbar(
     onTabCountClick: () -> Unit,
     onOpenTabGroup: (String) -> Unit,
     showTabStrip: Boolean,
-    showTabGroupBar: Boolean,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalClintColors.current
@@ -628,7 +593,6 @@ private fun BottomToolbar(
             .padding(bottom = with(density) { bottomPaddingPx.toDp() })
     ) {
         PageLoadProgress(state)
-        if (showTabGroupBar) TabGroupBarSlot(activity, state, onOpenTabGroup)
         if (showTabStrip) TabStripSlot(activity, state, onOpenTabGroup)
         AddressBarRow(
             activity = activity,
@@ -657,7 +621,6 @@ private fun BottomNavBar(
     state: MainUiState,
     navBarPaddingPx: Int,
     showTabStrip: Boolean,
-    showTabGroupBar: Boolean,
     onOpenTabGroup: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -675,7 +638,6 @@ private fun BottomNavBar(
             }
             .background(colors.surface)
     ) {
-        if (showTabGroupBar) TabGroupBarSlot(activity, state, onOpenTabGroup)
         if (showTabStrip) TabStripSlot(activity, state, onOpenTabGroup)
         BottomNavButtons(activity, state, navBarPaddingPx)
     }
@@ -687,7 +649,7 @@ private fun BottomNavButtons(activity: MainActivity, state: MainUiState, navBarP
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .height(44.dp)
             .padding(bottom = with(density) { navBarPaddingPx.toDp() }),
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
     ) {

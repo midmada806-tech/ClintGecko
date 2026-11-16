@@ -1,8 +1,8 @@
 package com.simplefox.browser.browser.menu
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.AnimatedVisibility
+import com.simplefox.browser.ui.animateContentSize
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

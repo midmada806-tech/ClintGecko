@@ -1,10 +1,10 @@
 package com.simplefox.browser.tabs
 
 import android.graphics.Bitmap
-import androidx.compose.animation.AnimatedVisibility
+import com.simplefox.browser.ui.AnimatedVisibility
 import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateDpAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -156,7 +156,8 @@ internal fun TabMenuCard(
                     exit = fadeOut(tween(120)) + scaleOut(targetScale = 0.6f)
                 ) {
                     if (favicon != null && !preview.isIncognito) {
-                        Image(favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(16.dp))
+                        val faviconImage = remember(favicon) { favicon.asImageBitmap() }
+                        Image(faviconImage, contentDescription = null, modifier = Modifier.size(16.dp))
                     } else {
                         Icon(
                             if (preview.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,
@@ -215,12 +216,13 @@ internal fun TabMenuCard(
                     .background(if (preview.isIncognito) Color(0xFF1C1C21) else colors.surfaceVariant)
             ) {
                 if (thumbnail != null) {
+                    val thumbnailImage = remember(thumbnail) { thumbnail.asImageBitmap() }
                     Image(
-                        thumbnail.asImageBitmap(),
+                        thumbnailImage,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        filterQuality = FilterQuality.High
+                        filterQuality = FilterQuality.Medium
                     )
                 } else {
                     Icon(
@@ -344,7 +346,8 @@ internal fun TabMenuListRow(
             contentAlignment = Alignment.Center
         ) {
             if (favicon != null && !preview.isIncognito) {
-                Image(favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(20.dp))
+                val faviconImage = remember(favicon) { favicon.asImageBitmap() }
+                Image(faviconImage, contentDescription = null, modifier = Modifier.size(20.dp))
             } else {
                 Icon(
                     if (preview.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,

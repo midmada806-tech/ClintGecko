@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -85,7 +86,6 @@ fun ExtensionsScreen(
     val extensions = ClintExtensions.extensions
     var filter by rememberSaveable { mutableIntStateOf(0) }
     var showLink by remember { mutableStateOf(false) }
-    val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     val onCount = extensions.count { it.status == ExtensionStatus.ON }
     val offCount = extensions.size - onCount
@@ -97,49 +97,15 @@ fun ExtensionsScreen(
 
     Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
-                Row(
-                    Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onExit) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = colors.onSurface)
-                    }
-                    Text(
-                        stringResource(R.string.ext_title),
-                        color = colors.onSurface,
-                        fontSize = 19.sp,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f).padding(start = 4.dp)
-                    )
-                    if (ClintExtensions.checkingAll) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.padding(end = 14.dp).size(22.dp),
-                            strokeWidth = 2.5.dp,
-                            color = colors.primary
-                        )
-                    } else {
-                        IconButton(onClick = { ClintExtensions.checkAllUpdates() }, enabled = extensions.isNotEmpty()) {
-                            Icon(
-                                Icons.Filled.Refresh,
-                                contentDescription = stringResource(R.string.ext_check_updates),
-                                tint = if (extensions.isNotEmpty()) colors.iconTint else colors.secondaryText.copy(alpha = 0.4f)
-                            )
-                        }
-                    }
-                }
-            }
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 330.dp),
+                    reverseLayout = true,
                     modifier = Modifier
+                        .statusBarsPadding()
                         .fillMaxHeight()
                         .widthIn(max = 1200.dp),
-                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 20.dp + navBottom),
+                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -182,6 +148,41 @@ fun ExtensionsScreen(
                     }
                     items(filtered, key = { it.id }) { info ->
                         ExtensionCard(info, onClick = { onOpenDetail(info.id) })
+                    }
+                }
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+                Row(
+                    Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onExit) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = colors.onSurface)
+                    }
+                    Text(
+                        stringResource(R.string.ext_title),
+                        color = colors.onSurface,
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f).padding(start = 4.dp)
+                    )
+                    if (ClintExtensions.checkingAll) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.padding(end = 14.dp).size(22.dp),
+                            strokeWidth = 2.5.dp,
+                            color = colors.primary
+                        )
+                    } else {
+                        IconButton(onClick = { ClintExtensions.checkAllUpdates() }, enabled = extensions.isNotEmpty()) {
+                            Icon(
+                                Icons.Filled.Refresh,
+                                contentDescription = stringResource(R.string.ext_check_updates),
+                                tint = if (extensions.isNotEmpty()) colors.iconTint else colors.secondaryText.copy(alpha = 0.4f)
+                            )
+                        }
                     }
                 }
             }

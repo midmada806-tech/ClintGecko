@@ -248,15 +248,6 @@ fun LookAndFeelScreen(
                     ClintSwitch(checked = state.tabGroupsEnabled)
                 }
             )
-            RowDivider(colors.divider)
-            SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Layers,
-                title = stringResource(R.string.pref_tab_group_bar_position_title),
-                summary = stringResource(tabBarPositionSummaryRes(state.tabGroupBarPosition)),
-                colors = colors,
-                enabled = state.tabGroupsEnabled,
-                onClick = { if (state.tabGroupsEnabled) state.openDialog = LookAndFeelDialog.TAB_GROUP_BAR_POSITION }
-            )
         }
 
         SettingsSectionLabel(stringResource(R.string.menu))

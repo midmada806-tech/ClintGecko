@@ -146,7 +146,8 @@ fun Modifier.settingsSearchHighlight(title: String, highlightColor: Color): Modi
             delay(350)
             requester.bringIntoView()
             flash.snapTo(1f)
-            flash.animateTo(0f, tween(durationMillis = 1600))
+            delay(1600)
+            flash.snapTo(0f)
         }
     }
     return this

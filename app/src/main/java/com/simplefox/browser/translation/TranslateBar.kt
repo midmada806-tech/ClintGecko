@@ -3,7 +3,7 @@ package com.simplefox.browser.translation
 import android.content.Context
 import android.os.Build
 import android.view.accessibility.AccessibilityManager
-import androidx.compose.animation.AnimatedVisibility
+import com.simplefox.browser.ui.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -269,7 +269,7 @@ private fun TranslateBarContent(
                     if (dragOffset <= -dismissThresholdPx) {
                         onDismiss()
                     } else {
-                        androidx.compose.animation.core.animate(dragOffset, 0f, animationSpec = tween(180)) { value, _ -> dragOffset = value }
+                        dragOffset = 0f
                     }
                 }
             )

@@ -411,7 +411,7 @@ private fun ClintWheelColumn(
                 val selected = index == centerIndex
                 Box(
                     Modifier.fillMaxWidth().height(WheelItemHeight)
-                        .clickable { scope.launch { state.animateScrollToItem(index) } },
+                        .clickable { scope.launch { state.scrollToItem(index) } },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

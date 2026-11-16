@@ -478,7 +478,7 @@ class ClintWebView(
         removeCallbacks(hideCoverRunnable)
         if (cover.visibility != android.view.View.VISIBLE) return
         cover.animate().cancel()
-        cover.animate().alpha(0f).setDuration(120).withEndAction {
+        cover.animate().alpha(0f).setDuration(0).withEndAction {
             cover.visibility = android.view.View.GONE
             cover.alpha = 1f
         }.start()

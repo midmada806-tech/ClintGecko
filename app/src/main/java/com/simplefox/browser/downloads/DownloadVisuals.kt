@@ -314,10 +314,10 @@ internal fun SwipeActionsBox(
                                     value < -threshold -> latestEnd
                                     else -> null
                                 }
-                                scope.launch { offset.animateTo(0f, tween(220)) }
+                                scope.launch { offset.snapTo(0f) }
                                 triggered?.onTrigger?.invoke()
                             },
-                            onDragCancel = { scope.launch { offset.animateTo(0f, tween(220)) } },
+                            onDragCancel = { scope.launch { offset.snapTo(0f) } },
                             onHorizontalDrag = { change, delta ->
                                 val limit = widthPx * 0.55f
                                 val next = (offset.value + delta).coerceIn(

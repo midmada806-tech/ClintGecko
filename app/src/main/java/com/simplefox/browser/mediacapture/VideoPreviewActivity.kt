@@ -11,7 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
+import com.simplefox.browser.ui.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
